@@ -26,12 +26,12 @@ st.dataframe(player_stats_df.head())
 # Filters in the sidebar
 st.sidebar.header("Filters")
 
-# Age slider (with both min and max)
+# Age slider (with both min and max set between 15 and 35)
 age_min, age_max = st.sidebar.slider(
     "Age Range",
-    min_value=int(player_stats_df['Age'].min()),
-    max_value=int(player_stats_df['Age'].max()),
-    value=(int(player_stats_df['Age'].min()), int(player_stats_df['Age'].max())),
+    min_value=15,
+    max_value=35,
+    value=(15, 35),
     step=1
 )
 
