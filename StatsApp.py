@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -12,15 +9,17 @@ import requests
 # Title of the app
 st.title("OBV Analysis")
 
-# If file is not uploaded, use the file from GitHub
-if uploaded_file is None:
-    file_url = "https://github.com/LeScott2406/StatsApp/raw/refs/heads/main/updated_player_stats.xlsx"
+# Cache function to read the file only once
+@st.cache
+def load_data():
+    file_url = "https://github.com/LeScott2406/StatsApp/raw/main/data/updated_player_stats.xlsx"
     response = requests.get(file_url)
-    with open("player-stats.csv", "wb") as f:
+    with open("updated_player_stats.xlsx", "wb") as f:
         f.write(response.content)
-    player_stats_df = pd.read_csv("player-stats.csv")
-else:
-    player_stats_df = pd.read_csv(uploaded_file)
+    return pd.read_excel("updated_player_stats.xlsx")
+
+# Load the data
+player_stats_df = load_data()
 
 # Display a preview of the dataset
 st.write("Data loaded successfully. Here's a preview of the dataset:")
@@ -61,7 +60,7 @@ conditions = [
 ]
 
 values = [
-    15, 18, # Add corresponding values...
+    15, 18,  # Add corresponding values...
 ]
 
 # Add the Matches column using numpy.select
@@ -115,5 +114,4 @@ if 'Matches' in player_stats_df.columns:
     )
 
 else:
-    st.warning("Please upload a CSV file to proceed.")
-
+    st.warning("There was an issue with the dataset.")
