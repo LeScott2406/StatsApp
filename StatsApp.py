@@ -12,12 +12,6 @@ import requests
 # Title of the app
 st.title("OBV Analysis")
 
-# Sidebar for file upload or use the file from GitHub
-st.sidebar.header("Upload your CSV file")
-
-# Option to upload a CSV file
-uploaded_file = st.sidebar.file_uploader("Choose a CSV file", type=["csv"])
-
 # If file is not uploaded, use the file from GitHub
 if uploaded_file is None:
     file_url = "https://github.com/LeScott2406/StatsApp/raw/refs/heads/main/updated_player_stats.xlsx"
