@@ -103,7 +103,7 @@ if selected_teams and "All" not in selected_teams:
 
 # Define the exact columns you want to display in the specified order
 display_columns = [
-    'Name', 'Team', 'Age', 'Primary Position', 
+    'Name', 'Team', 'Age', 'Primary Position', 'Usage',
     'Defensive Action OBV', 'Pass OBV', 
     'Dribble & Carry OBV', 'Shot OBV', 'OBV'
 ]
