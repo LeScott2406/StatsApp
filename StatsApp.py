@@ -13,7 +13,7 @@ st.title("OBV Analysis")
 @st.cache_data
 def load_data():
     # URL of the file on GitHub
-    file_url = "https://github.com/LeScott2406/StatsApp/raw/main/data/updated_player_stats.xlsx"
+    file_url = "https://github.com/LeScott2406/StatsApp/raw/refs/heads/main/updated_player_stats.xlsx"
     
     # Download the file from GitHub
     response = requests.get(file_url)
