@@ -19,10 +19,6 @@ def load_data():
 # Load the data
 player_stats_df = load_data()
 
-# Display a preview of the dataset
-st.write("Data loaded successfully. Here's a preview of the dataset:")
-st.dataframe(player_stats_df.head())
-
 # Filters in the sidebar
 st.sidebar.header("Filters")
 
@@ -35,25 +31,32 @@ age_min, age_max = st.sidebar.slider(
     step=1
 )
 
-# Usage slider (with both min and max)
+# Usage slider (with both min and max from 0 to 140)
 usage_min, usage_max = st.sidebar.slider(
     "Usage Range",
     min_value=0,
-    max_value=100,
-    value=(0, 100),
+    max_value=140,
+    value=(0, 140),
     step=1
 )
 
-# Position multi-select dropdown
-positions = ['GK', 'DEF', 'MID', 'FW', 'Other']  # Modify these options as per your dataset
-selected_positions = st.sidebar.multiselect("Position", positions)
+# Primary Position multi-select dropdown with an "All" option
+primary_positions = ['All'] + player_stats_df['Primary Position'].unique().tolist()
+selected_primary_positions = st.sidebar.multiselect("Primary Position", primary_positions)
 
-# Competition multi-select dropdown
-competitions = ['1. Bundesliga', 'La Liga', 'Premier League', 'Serie A', 'MLS', 'Other']  # Modify these options
+# Competition multi-select dropdown with an "All" option
+competitions = ['All'] + player_stats_df['Competition'].unique().tolist()
 selected_competitions = st.sidebar.multiselect("Competition", competitions)
 
-# Team multi-select dropdown
-teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Other']  # Modify these options
+# Team multi-select dropdown with an "All" option
+if selected_competitions:
+    if "All" in selected_competitions:
+        teams = ['All'] + player_stats_df['Team'].unique().tolist()
+    else:
+        teams = ['All'] + player_stats_df[player_stats_df['Competition'].isin(selected_competitions)]['Team'].unique().tolist()
+else:
+    teams = ['All']
+
 selected_teams = st.sidebar.multiselect("Team", teams)
 
 # Round the 'Minutes Played' column to 0 decimal places
@@ -88,13 +91,16 @@ if 'Matches' in player_stats_df.columns:
         (player_stats_df['Usage'] >= usage_min) & (player_stats_df['Usage'] <= usage_max)
     ]
 
-    if selected_positions:
-        filtered_df = filtered_df[filtered_df['Position'].isin(selected_positions)]
+    # Filter by Primary Position
+    if selected_primary_positions and "All" not in selected_primary_positions:
+        filtered_df = filtered_df[filtered_df['Primary Position'].isin(selected_primary_positions)]
 
-    if selected_competitions:
+    # Filter by Competition
+    if selected_competitions and "All" not in selected_competitions:
         filtered_df = filtered_df[filtered_df['Competition'].isin(selected_competitions)]
 
-    if selected_teams:
+    # Filter by Team
+    if selected_teams and "All" not in selected_teams:
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
 
     # Define the exact columns you want to display in the specified order
