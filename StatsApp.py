@@ -19,6 +19,14 @@ def load_data():
 # Load the data
 player_stats_df = load_data()
 
+# Calculate Team OBV
+if 'OBV' in player_stats_df.columns and 'Team' in player_stats_df.columns:
+    player_stats_df["Team OBV"] = player_stats_df.groupby("Team")["OBV"].transform("sum")
+
+    # Calculate Importance as a percentage
+    player_stats_df["Importance"] = (player_stats_df["OBV"] / player_stats_df["Team OBV"]) * 100
+    player_stats_df["Importance"] = player_stats_df["Importance"].round(2)  # Round to 2 decimal places
+
 # Filters in the sidebar
 st.sidebar.header("Filters")
 
@@ -64,22 +72,10 @@ selected_teams = st.sidebar.multiselect("Team", teams)
 if 'Minutes Played' in player_stats_df.columns:
     player_stats_df['Minutes Played'] = player_stats_df['Minutes Played'].round(0)
 
-# Define the conditions and their corresponding values (no need for these as we want all competitions)
-# conditions = [
-#     (player_stats_df["Competition"] == "1. Bundesliga"),
-#     (player_stats_df["Competition"] == "1. HNL"),
-#     # Add more conditions as needed...
-# ]
-# values = [
-#     15, 18, # Add corresponding values...
-# ]
-# player_stats_df["Matches"] = np.select(conditions, values, default=np.nan)
-
-# Calculate Available Minutes by multiplying Matches by 90 (if Matches is already present)
+# Calculate Available Minutes and Usage
 if 'Matches' in player_stats_df.columns:
     player_stats_df['Available Minutes'] = player_stats_df['Matches'] * 90
 
-    # Calculate 'Usage' by dividing 'Minutes Played' by 'Available Minutes' and multiplying by 100
     if 'Minutes Played' in player_stats_df.columns and 'Available Minutes' in player_stats_df.columns:
         player_stats_df['Usage'] = ((player_stats_df['Minutes Played'] / player_stats_df['Available Minutes']) * 100).round(2)
 
@@ -104,13 +100,17 @@ if selected_teams and "All" not in selected_teams:
 # Define the exact columns you want to display in the specified order
 display_columns = [
     'Name', 'Team', 'Age', 'Primary Position', 'Usage',
-    'Defensive Action OBV', 'Pass OBV', 
-    'Dribble & Carry OBV', 'Shot OBV', 'OBV'
+    'Defensive Action OBV', 'Pass OBV', 'Dribble & Carry OBV', 'Shot OBV', 'OBV',
+    'Team OBV', 'Importance'  # Added Team OBV and Importance
 ]
 
 # Check if all columns are present in the DataFrame
 available_columns = [col for col in display_columns if col in filtered_df.columns]
 filtered_df = filtered_df[available_columns]
+
+# Format Importance as a percentage
+if 'Importance' in filtered_df.columns:
+    filtered_df['Importance'] = filtered_df['Importance'].map(lambda x: f"{x:.2f}%")
 
 # Display the filtered DataFrame with the selected columns
 st.write("Filtered Player Stats:")
@@ -125,4 +125,3 @@ st.download_button(
     file_name="filtered_player_stats.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
-
